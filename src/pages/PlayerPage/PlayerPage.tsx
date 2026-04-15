@@ -3,6 +3,7 @@ import styles from './PlayerPage.module.css';
 import { DJDeck } from '../../components/DJDeck/DJDeck';
 import { PlaylistQueue } from '../../components/PlaylistQueue/PlaylistQueue';
 import { AddSongModal } from '../../components/AddSongModal/AddSongModal';
+import { LocalFilesModal } from '../../components/LocalFilesModal/LocalFilesModal';
 import { usePlaylist } from '../../hooks/usePlaylist';
 import { usePlayer } from '../../hooks/usePlayer';
 import { Song } from '../../types';
@@ -23,9 +24,10 @@ function useStars(count: number) {
 }
 
 export function PlayerPage() {
-  const { songs, currentSong, loading, fetchAllSongs, addSong, removeSong, selectSong } = usePlaylist();
+  const { songs, currentSong, loading, fetchAllSongs, addSong, addManySongs, removeSong, selectSong } = usePlaylist();
   const { isPlaying } = usePlayer();
   const [showModal, setShowModal] = useState(false);
+  const [showLocalModal, setShowLocalModal] = useState(false);
   const stars = useStars(100);
 
   useEffect(() => {
@@ -94,22 +96,44 @@ export function PlayerPage() {
         </aside>
       </main>
 
-      {/* FAB */}
-      <button
-        className={styles.fabBtn}
-        onClick={() => setShowModal(true)}
-        aria-label="Agregar canción"
-        title="Buscar y agregar canción"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-        </svg>
-      </button>
+      {/* FAB group */}
+      <div className={styles.fabGroup}>
+        {/* Local files button */}
+        <button
+          className={`${styles.fabBtn} ${styles.fabLocal}`}
+          onClick={() => setShowLocalModal(true)}
+          aria-label="Agregar desde archivos locales"
+          title="Agregar desde archivos locales"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+          </svg>
+        </button>
+
+        {/* iTunes search button */}
+        <button
+          className={styles.fabBtn}
+          onClick={() => setShowModal(true)}
+          aria-label="Buscar en iTunes"
+          title="Buscar en iTunes"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+        </button>
+      </div>
 
       {showModal && (
         <AddSongModal
           onClose={() => setShowModal(false)}
           onAdd={addSong}
+        />
+      )}
+
+      {showLocalModal && (
+        <LocalFilesModal
+          onClose={() => setShowLocalModal(false)}
+          onAddAll={addManySongs}
         />
       )}
     </div>

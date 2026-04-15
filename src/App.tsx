@@ -21,7 +21,7 @@ function AudioEngine() {
     if (audioRef.current) audioRef.current.volume = volume / 100;
   }, [volume]);
 
-  // Sync song source
+  // Sync song source — supports both iTunes URLs and local object URLs
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -29,7 +29,7 @@ function AudioEngine() {
     if (audio.src !== url) {
       audio.pause();
       audio.src = url;
-      audio.load();
+      if (url) audio.load();
     }
   }, [currentSong?.previewUrl, currentSong?.id]);
 
