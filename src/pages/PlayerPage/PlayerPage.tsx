@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import styles from './PlayerPage.module.css';
 import { DJDeck } from '../../components/DJDeck/DJDeck';
 import { PlaylistQueue } from '../../components/PlaylistQueue/PlaylistQueue';
@@ -8,6 +8,7 @@ import { DJModePanel } from '../../components/DJModePanel/DJModePanel';
 import { usePlaylist } from '../../hooks/usePlaylist';
 import { usePlayer } from '../../hooks/usePlayer';
 import { usePlayerContext } from '../../context/PlayerContext';
+import { playlistService } from '../../services/playlist.service';
 import { Song } from '../../types';
 
 function useStars(count: number) {
@@ -28,32 +29,51 @@ function useStars(count: number) {
 export function PlayerPage() {
   const { songs, currentSong, loading, fetchAllSongs, addSong, addManySongs, removeSong, selectSong } = usePlaylist();
   const { isPlaying } = usePlayer();
-  const { isDJMode } = usePlayerContext();
+  const { isDJMode, setSongs } = usePlayerContext();
   const [showModal, setShowModal] = useState(false);
   const [showLocalModal, setShowLocalModal] = useState(false);
+  const [djSelected, setDjSelected] = useState<Set<string>>(new Set());
   const stars = useStars(100);
 
-  useEffect(() => {
-    fetchAllSongs();
-  }, [fetchAllSongs]);
+  useEffect(() => { fetchAllSongs(); }, [fetchAllSongs]);
 
-  const handleSelectSong = (song: Song) => {
-    selectSong(song);
-  };
+  // Clear DJ selection when DJ mode is turned off
+  useEffect(() => {
+    if (!isDJMode) setDjSelected(new Set());
+  }, [isDJMode]);
+
+  const handleSelectSong = (song: Song) => { selectSong(song); };
+
+  const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
+    const reordered = playlistService.reorderSongs(fromIndex, toIndex);
+    setSongs(reordered);
+  }, [setSongs]);
+
+  const handleDJToggle = useCallback((id: string) => {
+    setDjSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    setDjSelected(new Set(songs.map((s) => s.id)));
+  }, [songs]);
+
+  const handleClearAll = useCallback(() => {
+    setDjSelected(new Set());
+  }, []);
 
   return (
     <div className={styles.page}>
       {/* Star field */}
       <div className={styles.stars} aria-hidden="true">
         {stars.map((s) => (
-          <div
-            key={s.id}
-            className={styles.star}
+          <div key={s.id} className={styles.star}
             style={{
-              top: s.top,
-              left: s.left,
-              width: s.size,
-              height: s.size,
+              top: s.top, left: s.left,
+              width: s.size, height: s.size,
               ['--duration' as string]: s.duration,
               ['--delay' as string]: s.delay,
             }}
@@ -61,7 +81,6 @@ export function PlayerPage() {
         ))}
       </div>
 
-      {/* Ambient gradient blobs */}
       <div className={styles.blob1} aria-hidden="true" />
       <div className={styles.blob2} aria-hidden="true" />
 
@@ -77,9 +96,7 @@ export function PlayerPage() {
           <span className={styles.statusText}>
             {isPlaying ? 'REPRODUCIENDO' : songs.length > 0 ? 'EN PAUSA' : 'SIN CANCIONES'}
           </span>
-          {songs.length > 0 && (
-            <span className={styles.songCount}>{songs.length} canciones</span>
-          )}
+          {songs.length > 0 && <span className={styles.songCount}>{songs.length} canciones</span>}
         </div>
       </header>
 
@@ -87,7 +104,12 @@ export function PlayerPage() {
       <main className={styles.layout}>
         <div className={styles.centerColumn}>
           <DJDeck />
-          <DJModePanel />
+          <DJModePanel
+            djSelected={djSelected}
+            onDJToggle={handleDJToggle}
+            onSelectAll={handleSelectAll}
+            onClearAll={handleClearAll}
+          />
         </div>
 
         <aside className={styles.sidebar}>
@@ -97,13 +119,16 @@ export function PlayerPage() {
             loading={loading}
             onRemove={removeSong}
             onSelectSong={handleSelectSong}
+            onReorder={handleReorder}
+            djMode={isDJMode}
+            djSelected={djSelected}
+            onDJToggle={handleDJToggle}
           />
         </aside>
       </main>
 
       {/* FAB group */}
       <div className={styles.fabGroup}>
-        {/* Local files button */}
         <button
           className={`${styles.fabBtn} ${styles.fabLocal}`}
           onClick={() => setShowLocalModal(true)}
@@ -114,13 +139,11 @@ export function PlayerPage() {
             <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
           </svg>
         </button>
-
-        {/* iTunes search button */}
         <button
           className={styles.fabBtn}
           onClick={() => setShowModal(true)}
-          aria-label="Buscar en iTunes"
-          title="Buscar en iTunes"
+          aria-label="Agregar canción"
+          title="Buscar y agregar canción"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -128,19 +151,8 @@ export function PlayerPage() {
         </button>
       </div>
 
-      {showModal && (
-        <AddSongModal
-          onClose={() => setShowModal(false)}
-          onAdd={addSong}
-        />
-      )}
-
-      {showLocalModal && (
-        <LocalFilesModal
-          onClose={() => setShowLocalModal(false)}
-          onAddAll={addManySongs}
-        />
-      )}
+      {showModal && <AddSongModal onClose={() => setShowModal(false)} onAdd={addSong} />}
+      {showLocalModal && <LocalFilesModal onClose={() => setShowLocalModal(false)} onAddAll={addManySongs} />}
     </div>
   );
 }

@@ -93,6 +93,24 @@ export const playlistService = {
     return songs[idx];
   },
 
+  reorderSongs(fromIndex: number, toIndex: number): Song[] {
+    const songs = load();
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= songs.length || toIndex >= songs.length) return songs;
+    const [moved] = songs.splice(fromIndex, 1);
+    songs.splice(toIndex, 0, moved);
+    save(songs);
+    // Keep current index pointing to same song
+    const curIdx = loadCurrentIndex();
+    if (fromIndex === curIdx) {
+      saveCurrentIndex(toIndex);
+    } else if (fromIndex < curIdx && toIndex >= curIdx) {
+      saveCurrentIndex(curIdx - 1);
+    } else if (fromIndex > curIdx && toIndex <= curIdx) {
+      saveCurrentIndex(curIdx + 1);
+    }
+    return songs;
+  },
+
   shufflePlaylist(): Song[] {
     const songs = load();
     const shuffled = shuffle(songs);
