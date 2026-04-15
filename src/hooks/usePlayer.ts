@@ -2,9 +2,7 @@ import { useCallback } from 'react';
 import { usePlayerContext } from '../context/PlayerContext';
 import { playlistService } from '../services/playlist.service';
 
-/**
- * usePlayer — playback controls: play/pause, next, prev, volume, shuffle, repeat.
- */
+/** usePlayer — playback controls: play/pause, next, prev, volume, shuffle, repeat. */
 export function usePlayer() {
   const {
     isPlaying,
@@ -24,42 +22,28 @@ export function usePlayer() {
     setIsPlaying(!isPlaying);
   }, [isPlaying, setIsPlaying]);
 
-  const navigateNext = useCallback(async () => {
-    try {
-      const res = await playlistService.navigateNext();
-      if (res.success) {
-        setCurrentSong(res.data);
-      }
-    } catch {
-      addToast('Error al avanzar la canción', 'error');
-    }
-  }, [setCurrentSong, addToast]);
+  const navigateNext = useCallback(() => {
+    const next = playlistService.navigateNext();
+    setCurrentSong(next);
+    if (next) setIsPlaying(true);
+  }, [setCurrentSong, setIsPlaying]);
 
-  const navigatePrev = useCallback(async () => {
-    try {
-      const res = await playlistService.navigatePrev();
-      if (res.success) {
-        setCurrentSong(res.data);
-      }
-    } catch {
-      addToast('Error al retroceder la canción', 'error');
-    }
-  }, [setCurrentSong, addToast]);
+  const navigatePrev = useCallback(() => {
+    const prev = playlistService.navigatePrev();
+    setCurrentSong(prev);
+    if (prev) setIsPlaying(true);
+  }, [setCurrentSong, setIsPlaying]);
 
-  const toggleShuffle = useCallback(async () => {
+  const toggleShuffle = useCallback(() => {
     if (!isShuffle) {
-      try {
-        const res = await playlistService.shufflePlaylist();
-        if (res.success) {
-          setSongs(res.data);
-          addToast('Playlist mezclada', 'success');
-        }
-      } catch {
-        addToast('Error al mezclar', 'error');
-      }
+      const shuffled = playlistService.shufflePlaylist();
+      setSongs(shuffled);
+      const current = playlistService.getCurrentSong();
+      setCurrentSong(current);
+      addToast('Playlist mezclada 🔀', 'success');
     }
     setIsShuffle(!isShuffle);
-  }, [isShuffle, setIsShuffle, setSongs, addToast]);
+  }, [isShuffle, setIsShuffle, setSongs, setCurrentSong, addToast]);
 
   const toggleRepeat = useCallback(() => {
     setIsRepeat(!isRepeat);

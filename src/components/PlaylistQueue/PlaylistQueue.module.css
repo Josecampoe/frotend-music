@@ -9,8 +9,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 0 0.75rem 0;
+  padding-bottom: 0.85rem;
   flex-shrink: 0;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 0.75rem;
 }
 
 .title {
@@ -38,68 +40,110 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding-right: 0.25rem;
+  gap: 0.35rem;
+  padding-right: 0.2rem;
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: 10px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  gap: 0.7rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-  animation: slideIn 0.25s ease forwards;
-  will-change: transform;
+  animation: slideIn 0.2s ease forwards;
 }
 
 .item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(124, 58, 237, 0.3);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .item.active {
-  background: rgba(124, 58, 237, 0.12);
-  border-color: rgba(124, 58, 237, 0.6);
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.5);
   border-left: 3px solid var(--color-accent-purple);
-  box-shadow: -4px 0 16px rgba(124, 58, 237, 0.3), inset 0 0 20px rgba(124, 58, 237, 0.05);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
 }
 
-.dragHandle {
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
-  opacity: 0.4;
+/* Album art */
+.artWrapper {
+  position: relative;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
-  cursor: grab;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.index {
+.art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.artPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.artIndex {
   font-family: 'Orbitron', monospace;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--color-text-muted);
-  min-width: 18px;
-  text-align: center;
-  flex-shrink: 0;
 }
 
-.active .index {
-  color: var(--color-accent-purple);
+/* Playing overlay with animated bars */
+.playingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.playingDots {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.playingDots span {
+  display: block;
+  width: 3px;
+  background: var(--color-accent-cyan);
+  border-radius: 2px;
+  animation: eq-dance 0.6s ease-in-out infinite alternate;
+}
+
+.playingDots span:nth-child(1) { height: 6px; animation-delay: 0s; --bar-height: 14px; }
+.playingDots span:nth-child(2) { height: 10px; animation-delay: 0.15s; --bar-height: 8px; }
+.playingDots span:nth-child(3) { height: 8px; animation-delay: 0.3s; --bar-height: 12px; }
+
+/* Song info */
 .songInfo {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.15rem;
 }
 
 .songTitle {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -109,40 +153,46 @@
 
 .active .songTitle {
   color: var(--color-accent-cyan);
-  text-shadow: var(--glow-cyan);
 }
 
 .songArtist {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Right side */
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
 .songDuration {
   font-family: 'Orbitron', monospace;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--color-text-muted);
-  flex-shrink: 0;
 }
 
 .removeBtn {
   background: none;
   border: none;
   color: var(--color-text-muted);
-  font-size: 0.75rem;
-  padding: 0.25rem;
+  padding: 0.2rem;
   border-radius: 4px;
   opacity: 0;
   transition: opacity 0.2s, color 0.2s, background 0.2s;
-  flex-shrink: 0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.item:hover .removeBtn {
-  opacity: 1;
-}
+.item:hover .removeBtn { opacity: 1; }
 
 .removeBtn:hover {
   color: var(--color-accent-pink);
@@ -155,10 +205,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.6rem;
   height: 100%;
-  color: var(--color-text-muted);
   text-align: center;
+  padding: 2rem;
 }
 
 .emptyIcon {
@@ -166,9 +216,18 @@
   animation: float-up 3s ease-in-out infinite;
 }
 
-.emptyText {
+.emptyTitle {
   font-size: 0.85rem;
+  font-weight: 600;
   color: var(--color-text-muted);
+}
+
+.emptyHint {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  max-width: 200px;
+  line-height: 1.5;
 }
 
 /* Skeleton */
@@ -180,7 +239,7 @@
 
 .skeletonItem {
   height: 52px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }

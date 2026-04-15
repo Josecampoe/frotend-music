@@ -1,31 +1,14 @@
-/** Core song shape — mirrors the backend Song entity. */
+/** Core song shape. */
 export interface Song {
   id: string;
   title: string;
   artist: string;
   album: string;
-  duration: string; // MM:SS format
+  duration: string;   // MM:SS format
   genre: string;
-  coverUrl?: string;
+  coverUrl?: string;  // Album artwork from iTunes
   previewUrl?: string; // iTunes 30-second preview
 }
 
-/** Payload for creating a new song. */
-export interface CreateSongDTO {
-  title: string;
-  artist: string;
-  album?: string;
-  duration: string; // MM:SS
-  genre: string;
-  position: Position;
-}
-
-/** Generic API response wrapper. */
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message: string;
-}
-
-/** Position in the doubly linked list. */
+/** Position in the playlist when adding. */
 export type Position = 'first' | 'last' | number;

@@ -1,39 +1,103 @@
-import axios, { AxiosError } from 'axios';
-import { ApiResponse, CreateSongDTO, Song } from '../types';
+/**
+ * playlist.service.ts — 100% frontend, no backend needed.
+ * Persists the playlist in localStorage.
+ */
+import { Song } from '../types';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1',
-  timeout: 10000,
-});
+const STORAGE_KEY = 'dj-playlist';
+const CURRENT_KEY = 'dj-current-index';
 
-// Response interceptor — log errors
-api.interceptors.response.use(
-  (res) => res,
-  (err: AxiosError) => {
-    console.error('[API Error]', err.message, err.response?.data);
-    return Promise.reject(err);
+function load(): Song[] {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+  } catch {
+    return [];
   }
-);
+}
+
+function save(songs: Song[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+}
+
+function loadCurrentIndex(): number {
+  return parseInt(localStorage.getItem(CURRENT_KEY) ?? '0', 10) || 0;
+}
+
+function saveCurrentIndex(i: number): void {
+  localStorage.setItem(CURRENT_KEY, String(i));
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export const playlistService = {
-  getAllSongs: (): Promise<ApiResponse<Song[]>> =>
-    api.get<ApiResponse<Song[]>>('/playlist/songs').then((r) => r.data),
+  getAllSongs(): Song[] {
+    return load();
+  },
 
-  getCurrentSong: (): Promise<ApiResponse<Song | null>> =>
-    api.get<ApiResponse<Song | null>>('/playlist/songs/current').then((r) => r.data),
+  getCurrentSong(): Song | null {
+    const songs = load();
+    if (!songs.length) return null;
+    const idx = Math.min(loadCurrentIndex(), songs.length - 1);
+    return songs[idx] ?? null;
+  },
 
-  addSong: (dto: CreateSongDTO): Promise<ApiResponse<Song>> =>
-    api.post<ApiResponse<Song>>('/playlist/songs', dto).then((r) => r.data),
+  addSong(song: Omit<Song, 'id'>): Song {
+    const songs = load();
+    const newSong: Song = { ...song, id: crypto.randomUUID() };
+    songs.push(newSong);
+    save(songs);
+    // If first song, set as current
+    if (songs.length === 1) saveCurrentIndex(0);
+    return newSong;
+  },
 
-  removeSong: (id: string): Promise<ApiResponse<null>> =>
-    api.delete<ApiResponse<null>>(`/playlist/songs/${id}`).then((r) => r.data),
+  removeSong(id: string): void {
+    const songs = load();
+    const idx = songs.findIndex((s) => s.id === id);
+    if (idx === -1) return;
+    songs.splice(idx, 1);
+    save(songs);
+    // Adjust current index
+    const cur = loadCurrentIndex();
+    if (cur >= songs.length) saveCurrentIndex(Math.max(0, songs.length - 1));
+  },
 
-  navigateNext: (): Promise<ApiResponse<Song | null>> =>
-    api.post<ApiResponse<Song | null>>('/playlist/navigation/next').then((r) => r.data),
+  navigateNext(): Song | null {
+    const songs = load();
+    if (!songs.length) return null;
+    const next = (loadCurrentIndex() + 1) % songs.length;
+    saveCurrentIndex(next);
+    return songs[next];
+  },
 
-  navigatePrev: (): Promise<ApiResponse<Song | null>> =>
-    api.post<ApiResponse<Song | null>>('/playlist/navigation/prev').then((r) => r.data),
+  navigatePrev(): Song | null {
+    const songs = load();
+    if (!songs.length) return null;
+    const prev = (loadCurrentIndex() - 1 + songs.length) % songs.length;
+    saveCurrentIndex(prev);
+    return songs[prev];
+  },
 
-  shufflePlaylist: (): Promise<ApiResponse<Song[]>> =>
-    api.post<ApiResponse<Song[]>>('/playlist/shuffle').then((r) => r.data),
+  setCurrentById(id: string): Song | null {
+    const songs = load();
+    const idx = songs.findIndex((s) => s.id === id);
+    if (idx === -1) return null;
+    saveCurrentIndex(idx);
+    return songs[idx];
+  },
+
+  shufflePlaylist(): Song[] {
+    const songs = load();
+    const shuffled = shuffle(songs);
+    save(shuffled);
+    saveCurrentIndex(0);
+    return shuffled;
+  },
 };

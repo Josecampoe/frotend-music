@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './AddSongModal.module.css';
-import { CreateSongDTO, Position } from '../../types';
+import { Song } from '../../types';
 import { searchItunes, msToMMSS, ItunesTrack } from '../../services/itunes.service';
 
 interface AddSongModalProps {
   onClose: () => void;
-  onAdd: (dto: CreateSongDTO) => Promise<void>;
+  onAdd: (song: Omit<Song, 'id'>) => Promise<void>;
 }
 
 const GENRES = ['Pop', 'Rock', 'Electronic', 'Hip-Hop', 'Jazz', 'Reggaeton', 'Salsa', 'Classical'];
@@ -23,8 +23,6 @@ const EMPTY: FormState = { title: '', artist: '', album: '', duration: '', genre
 /** Modal for adding a new song — with iTunes search autocomplete. */
 export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
   const [form, setForm] = useState<FormState>(EMPTY);
-  const [positionType, setPositionType] = useState<'first' | 'last' | 'specific'>('last');
-  const [specificPos, setSpecificPos] = useState(1);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -117,18 +115,16 @@ export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
     if (!validate()) return;
     setSubmitting(true);
     previewAudio?.pause();
-    const position: Position = positionType === 'specific' ? specificPos : positionType;
     try {
       await onAdd({
         title: form.title.trim(),
         artist: form.artist.trim(),
-        album: form.album.trim() || undefined,
+        album: form.album.trim() || '',
         duration: form.duration.trim(),
         genre: form.genre,
-        position,
         coverUrl: selectedTrack?.artworkUrl100.replace('100x100', '300x300'),
         previewUrl: selectedTrack?.previewUrl,
-      } as CreateSongDTO & { coverUrl?: string; previewUrl?: string });
+      });
       onClose();
     } finally {
       setSubmitting(false);
@@ -311,34 +307,6 @@ export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
               </select>
               {errors.genre && <span className={styles.errorMsg}>{errors.genre}</span>}
             </div>
-          </div>
-
-          {/* Position selector */}
-          <div className={styles.field}>
-            <label className={styles.label}>Posición</label>
-            <div className={styles.positionGroup}>
-              {(['first', 'last', 'specific'] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  className={`${styles.posBtn} ${positionType === p ? styles.selected : ''}`}
-                  onClick={() => setPositionType(p)}
-                >
-                  {p === 'first' ? 'Al inicio' : p === 'last' ? 'Al final' : 'Posición específica'}
-                </button>
-              ))}
-            </div>
-            {positionType === 'specific' && (
-              <input
-                type="number"
-                min={1}
-                className={styles.input}
-                style={{ marginTop: '0.5rem' }}
-                placeholder="Número de posición"
-                value={specificPos}
-                onChange={(e) => setSpecificPos(Math.max(1, Number(e.target.value)))}
-              />
-            )}
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={submitting}>

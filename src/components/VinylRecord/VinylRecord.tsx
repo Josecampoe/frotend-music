@@ -7,100 +7,99 @@ interface VinylRecordProps {
   size?: number;
 }
 
-/** Spinning vinyl disc with SVG grooves and neon glow ring. */
-export function VinylRecord({ song, isPlaying, size = 220 }: VinylRecordProps) {
+export function VinylRecord({ song, isPlaying, size = 240 }: VinylRecordProps) {
   const r = size / 2;
-
-  // Build concentric groove rings
-  const grooves = Array.from({ length: 10 }, (_, i) => {
-    const radius = r * 0.95 - i * (r * 0.055);
-    return radius;
-  });
+  const grooves = Array.from({ length: 12 }, (_, i) => r * 0.96 - i * (r * 0.05));
 
   return (
     <div className={styles.wrapper} style={{ width: size, height: size }}>
+      {/* Outer glow ring */}
       <div className={`${styles.glowRing} ${isPlaying ? styles.playing : ''}`} />
 
+      {/* Disc */}
       <div
         className={`${styles.disc} ${isPlaying ? styles.spinning : ''}`}
         style={{ width: size, height: size }}
       >
+        {/* Album art as background if available */}
+        {song?.coverUrl && (
+          <div
+            className={styles.albumArt}
+            style={{ backgroundImage: `url(${song.coverUrl})` }}
+          />
+        )}
+
         <svg
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}
           xmlns="http://www.w3.org/2000/svg"
+          className={styles.svg}
         >
-          {/* Outer disc */}
-          <circle cx={r} cy={r} r={r} fill="#0d0d14" />
+          <defs>
+            <linearGradient id="iridescent" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stopColor="#7c3aed" stopOpacity="0.7" />
+              <stop offset="33%"  stopColor="#06b6d4" stopOpacity="0.7" />
+              <stop offset="66%"  stopColor="#ec4899" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.7" />
+            </linearGradient>
+            <radialGradient id="discGrad" cx="40%" cy="35%">
+              <stop offset="0%"   stopColor="#1e1e3a" />
+              <stop offset="100%" stopColor="#0a0a14" />
+            </radialGradient>
+            <mask id="labelMask">
+              <rect width={size} height={size} fill="white" />
+              <circle cx={r} cy={r} r={r * 0.3} fill="black" />
+            </mask>
+          </defs>
+
+          {/* Base disc */}
+          <circle cx={r} cy={r} r={r} fill="url(#discGrad)" />
 
           {/* Groove rings */}
           {grooves.map((radius, i) => (
             <circle
               key={i}
-              cx={r}
-              cy={r}
-              r={radius}
+              cx={r} cy={r} r={radius}
               fill="none"
-              stroke={i % 3 === 0 ? '#2a2a3e' : '#1e1e2e'}
-              strokeWidth={i % 3 === 0 ? 1.5 : 0.8}
-              opacity={0.7 - i * 0.04}
+              stroke={i % 4 === 0 ? '#2e2e4e' : '#1a1a2e'}
+              strokeWidth={i % 4 === 0 ? 1.5 : 0.7}
+              opacity={0.8 - i * 0.03}
             />
           ))}
 
-          {/* Iridescent sheen band */}
+          {/* Iridescent sheen */}
           <circle
-            cx={r}
-            cy={r}
-            r={r * 0.72}
+            cx={r} cy={r} r={r * 0.7}
             fill="none"
             stroke="url(#iridescent)"
-            strokeWidth={r * 0.18}
-            opacity={0.25}
+            strokeWidth={r * 0.22}
+            opacity={0.2}
+            mask="url(#labelMask)"
           />
 
-          {/* Center label background */}
-          <circle cx={r} cy={r} r={r * 0.28} fill="#1a0a2e" />
-          <circle
-            cx={r}
-            cy={r}
-            r={r * 0.28}
-            fill="none"
-            stroke="rgba(124,58,237,0.5)"
-            strokeWidth={1.5}
-          />
+          {/* Center label area */}
+          <circle cx={r} cy={r} r={r * 0.3} fill={song?.coverUrl ? 'rgba(0,0,0,0.6)' : '#1a0a2e'} />
+          <circle cx={r} cy={r} r={r * 0.3} fill="none" stroke="rgba(124,58,237,0.5)" strokeWidth={1.5} />
 
-          {/* Radial label lines */}
+          {/* Radial spokes on label */}
           {Array.from({ length: 8 }, (_, i) => {
             const angle = (i * 45 * Math.PI) / 180;
-            const x1 = r + Math.cos(angle) * r * 0.18;
-            const y1 = r + Math.sin(angle) * r * 0.18;
-            const x2 = r + Math.cos(angle) * r * 0.26;
-            const y2 = r + Math.sin(angle) * r * 0.26;
             return (
               <line
                 key={i}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                stroke="rgba(124,58,237,0.4)"
+                x1={r + Math.cos(angle) * r * 0.18}
+                y1={r + Math.sin(angle) * r * 0.18}
+                x2={r + Math.cos(angle) * r * 0.28}
+                y2={r + Math.sin(angle) * r * 0.28}
+                stroke="rgba(124,58,237,0.35)"
                 strokeWidth={0.8}
               />
             );
           })}
 
           {/* Center hole */}
-          <circle cx={r} cy={r} r={r * 0.04} fill="#0a0a0f" />
-
-          <defs>
-            <linearGradient id="iridescent" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.6" />
-              <stop offset="33%" stopColor="#06b6d4" stopOpacity="0.6" />
-              <stop offset="66%" stopColor="#ec4899" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.6" />
-            </linearGradient>
-          </defs>
+          <circle cx={r} cy={r} r={r * 0.045} fill="#050508" />
         </svg>
 
         {/* Shimmer overlay */}
@@ -115,10 +114,13 @@ export function VinylRecord({ song, isPlaying, size = 220 }: VinylRecordProps) {
               <span className={styles.labelArtist}>{song.artist}</span>
             </>
           ) : (
-            <span className={styles.labelText}>NO TRACK</span>
+            <span className={styles.labelText} style={{ opacity: 0.4 }}>NO TRACK</span>
           )}
         </div>
       </div>
+
+      {/* Playing indicator pulse */}
+      {isPlaying && <div className={styles.playPulse} />}
     </div>
   );
 }

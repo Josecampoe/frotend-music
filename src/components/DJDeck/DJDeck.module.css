@@ -5,115 +5,105 @@
   gap: 1.5rem;
   padding: 2rem;
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
+  border-radius: 28px;
   position: relative;
+  overflow: hidden;
   flex: 1;
   min-width: 0;
 }
 
-.turntables {
+/* Blurred album art background */
+.artGlow {
+  position: absolute;
+  inset: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(60px) saturate(1.5);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 1s ease;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2rem;
+  gap: 1.25rem;
   width: 100%;
 }
 
-.platter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.45;
-  transform: scale(0.75);
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-.platterLabel {
-  font-family: 'Orbitron', monospace;
-  font-size: 0.6rem;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.mainPlatter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+.vinylSection {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.tonearmWrapper {
-  position: absolute;
-  top: -10px;
-  right: -30px;
-  width: 80px;
-  height: 80px;
-  z-index: 10;
-  transform-origin: 70px 10px;
-}
-
-.tonearmWrapper.playing {
-  animation: tonearm-drop 0.6s ease forwards;
-}
-
-.tonearmWrapper.paused {
-  transform: rotate(-20deg);
-}
-
+/* Song info */
 .songInfo {
   text-align: center;
-  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 320px;
+  width: 100%;
 }
 
 .songTitle {
   font-family: 'Orbitron', monospace;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: var(--glow-purple);
+  max-width: 100%;
+  text-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+  letter-spacing: 0.03em;
 }
 
 .songArtist {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: var(--color-accent-cyan);
-  margin-top: 0.2rem;
+  letter-spacing: 0.05em;
 }
 
 .songMeta {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--color-text-muted);
-  margin-top: 0.15rem;
-}
-
-.bpmRow {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  width: 100%;
+  gap: 0.4rem;
+  flex-wrap: wrap;
   justify-content: center;
 }
 
-.bpmDisplay {
+.dot {
+  opacity: 0.4;
+}
+
+/* BPM badge */
+.bpmBadge {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(124, 58, 237, 0.1);
+  align-items: baseline;
+  gap: 0.3rem;
+  background: rgba(124, 58, 237, 0.12);
   border: 1px solid rgba(124, 58, 237, 0.3);
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  margin-top: 0.25rem;
 }
 
 .bpmValue {
   font-family: 'Orbitron', monospace;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 900;
   color: var(--color-accent-purple);
   text-shadow: var(--glow-purple);
@@ -121,54 +111,21 @@
 }
 
 .bpmLabel {
-  font-size: 0.6rem;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.55rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  margin-top: 2px;
 }
 
-.pitchFader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.pitchLabel {
-  font-size: 0.6rem;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.pitchTrack {
-  width: 6px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.pitchThumb {
-  position: absolute;
-  left: 50%;
-  top: 40%;
-  transform: translate(-50%, -50%);
-  width: 18px;
-  height: 8px;
-  background: var(--color-accent-cyan);
-  border-radius: 2px;
-  box-shadow: var(--glow-cyan);
-}
-
-@media (max-width: 768px) {
-  .turntables {
-    gap: 1rem;
-  }
-
-  .platter {
-    display: none;
-  }
+/* iTunes preview badge */
+.previewBadge {
+  font-size: 0.65rem;
+  color: var(--color-accent-cyan);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 20px;
+  padding: 0.2rem 0.75rem;
+  letter-spacing: 0.05em;
+  animation: fadeIn 0.4s ease;
 }

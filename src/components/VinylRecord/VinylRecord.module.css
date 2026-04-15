@@ -7,15 +7,18 @@
 
 .glowRing {
   position: absolute;
-  inset: -8px;
+  inset: -10px;
   border-radius: 50%;
-  transition: box-shadow 0.6s ease;
+  transition: box-shadow 0.8s ease, opacity 0.8s ease;
   pointer-events: none;
   z-index: 0;
 }
 
 .glowRing.playing {
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.7), 0 0 60px rgba(6, 182, 212, 0.4);
+  box-shadow:
+    0 0 30px rgba(124, 58, 237, 0.8),
+    0 0 60px rgba(6, 182, 212, 0.5),
+    0 0 100px rgba(236, 72, 153, 0.3);
   animation: neon-pulse 2s ease-in-out infinite;
 }
 
@@ -24,12 +27,32 @@
   border-radius: 50%;
   will-change: transform;
   z-index: 1;
-  animation-play-state: paused;
+  overflow: hidden;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .disc.spinning {
-  animation: vinyl-spin 2s linear infinite;
-  animation-play-state: running;
+  animation: vinyl-spin 2.4s linear infinite;
+}
+
+/* Album art layer */
+.albumArt {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.svg {
+  position: relative;
+  z-index: 1;
+  display: block;
 }
 
 .shimmer {
@@ -38,11 +61,12 @@
   border-radius: 50%;
   background: conic-gradient(
     transparent 0deg,
-    rgba(255, 255, 255, 0.08) 30deg,
-    transparent 60deg
+    rgba(255, 255, 255, 0.1) 20deg,
+    transparent 50deg,
+    rgba(255, 255, 255, 0.04) 180deg,
+    transparent 210deg
   );
-  animation: vinyl-spin 4s linear infinite;
-  animation-play-state: inherit;
+  animation: vinyl-spin 5s linear infinite;
   pointer-events: none;
   z-index: 2;
 }
@@ -59,36 +83,55 @@
   justify-content: center;
   text-align: center;
   pointer-events: none;
+  width: 60%;
 }
 
 .centerHole {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--color-bg-primary);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 4px;
+  background: #050508;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 5px;
+  flex-shrink: 0;
 }
 
 .labelText {
   font-family: 'Orbitron', monospace;
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   font-weight: 700;
   color: var(--color-text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  max-width: 80px;
+  letter-spacing: 0.04em;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-shadow: 0 0 8px rgba(124, 58, 237, 0.8);
+  text-shadow: 0 0 10px rgba(124, 58, 237, 0.9);
 }
 
 .labelArtist {
-  font-size: 0.45rem;
-  color: var(--color-text-muted);
-  max-width: 80px;
+  font-size: 0.42rem;
+  color: var(--color-accent-cyan);
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* Playing pulse ring */
+.playPulse {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  border: 2px solid rgba(124, 58, 237, 0.4);
+  animation: play-pulse-ring 1.5s ease-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes play-pulse-ring {
+  0%   { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.15); opacity: 0; }
 }

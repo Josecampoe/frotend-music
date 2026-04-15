@@ -1,61 +1,57 @@
 import { useCallback } from 'react';
 import { usePlayerContext } from '../context/PlayerContext';
 import { playlistService } from '../services/playlist.service';
-import { CreateSongDTO } from '../types';
+import { Song } from '../types';
 
-/**
- * usePlaylist — CRUD operations for the playlist.
- */
+/** usePlaylist — CRUD operations using local state + localStorage. */
 export function usePlaylist() {
   const { songs, setSongs, currentSong, setCurrentSong, loading, setLoading, addToast } =
     usePlayerContext();
 
-  const fetchAllSongs = useCallback(async () => {
+  const fetchAllSongs = useCallback(() => {
     setLoading(true);
     try {
-      const [songsRes, currentRes] = await Promise.all([
-        playlistService.getAllSongs(),
-        playlistService.getCurrentSong(),
-      ]);
-      if (songsRes.success) setSongs(songsRes.data);
-      if (currentRes.success) setCurrentSong(currentRes.data);
-    } catch {
-      addToast('Error al cargar el playlist', 'error');
+      const all = playlistService.getAllSongs();
+      const current = playlistService.getCurrentSong();
+      setSongs(all);
+      setCurrentSong(current);
     } finally {
       setLoading(false);
     }
-  }, [setSongs, setCurrentSong, setLoading, addToast]);
+  }, [setSongs, setCurrentSong, setLoading]);
 
   const addSong = useCallback(
-    async (dto: CreateSongDTO) => {
-      try {
-        const res = await playlistService.addSong(dto);
-        if (res.success) {
-          await fetchAllSongs();
-          addToast(`"${dto.title}" agregada al playlist`, 'success');
-        }
-      } catch {
-        addToast('Error al agregar la canción', 'error');
-      }
+    async (dto: Omit<Song, 'id'>) => {
+      const newSong = playlistService.addSong(dto);
+      const all = playlistService.getAllSongs();
+      setSongs(all);
+      // Auto-select if first song
+      if (all.length === 1) setCurrentSong(newSong);
+      addToast(`"${dto.title}" agregada al playlist`, 'success');
     },
-    [fetchAllSongs, addToast]
+    [setSongs, setCurrentSong, addToast]
   );
 
   const removeSong = useCallback(
-    async (id: string) => {
+    (id: string) => {
       const song = songs.find((s) => s.id === id);
-      try {
-        const res = await playlistService.removeSong(id);
-        if (res.success) {
-          await fetchAllSongs();
-          addToast(`"${song?.title ?? 'Canción'}" eliminada`, 'info');
-        }
-      } catch {
-        addToast('Error al eliminar la canción', 'error');
-      }
+      playlistService.removeSong(id);
+      const all = playlistService.getAllSongs();
+      setSongs(all);
+      const current = playlistService.getCurrentSong();
+      setCurrentSong(current);
+      addToast(`"${song?.title ?? 'Canción'}" eliminada`, 'info');
     },
-    [songs, fetchAllSongs, addToast]
+    [songs, setSongs, setCurrentSong, addToast]
   );
 
-  return { songs, currentSong, loading, fetchAllSongs, addSong, removeSong };
+  const selectSong = useCallback(
+    (song: Song) => {
+      const selected = playlistService.setCurrentById(song.id);
+      if (selected) setCurrentSong(selected);
+    },
+    [setCurrentSong]
+  );
+
+  return { songs, currentSong, loading, fetchAllSongs, addSong, removeSong, selectSong };
 }
