@@ -378,3 +378,99 @@
   background: rgba(255, 255, 255, 0.07);
   margin: 0.25rem 0;
 }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 0.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tabActive {
+  background: rgba(124, 58, 237, 0.2) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.2);
+}
+
+/* YouTube check mark */
+.ytCheck {
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-accent-green);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* YouTube preview card */
+.ytPreview {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: rgba(255, 0, 0, 0.06);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 0.65rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.ytThumb {
+  width: 80px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.ytInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ytLabel {
+  font-size: 0.62rem;
+  color: #ff6b6b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.ytId {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.ytNote {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}

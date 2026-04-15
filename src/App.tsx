@@ -42,6 +42,11 @@ function AudioEngine() {
 
   // ── Song change handler ──────────────────────────────────────────────────
   useEffect(() => {
+    // YouTube songs are handled by the YouTubePlayer iframe — skip audio engine
+    if (currentSong?.youtubeId) {
+      audioRef.current?.pause();
+      return;
+    }
     if (!currentSong?.previewUrl) return;
     const isNewSong = currentSong.id !== prevSongIdRef.current;
     prevSongIdRef.current = currentSong.id;
@@ -75,7 +80,8 @@ function AudioEngine() {
 
   // ── Play/pause sync (normal mode) ────────────────────────────────────────
   useEffect(() => {
-    if (isDJMode) return; // DJ mode manages its own playback
+    if (isDJMode) return;
+    if (currentSong?.youtubeId) return; // YouTube iframe handles this
     const audio = audioRef.current;
     if (!audio || !currentSong?.previewUrl) return;
 

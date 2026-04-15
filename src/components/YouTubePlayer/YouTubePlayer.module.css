@@ -1,0 +1,25 @@
+.wrapper {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  box-shadow:
+    0 0 30px rgba(236, 72, 153, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  animation: fadeIn 0.4s ease;
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* The actual iframe injected by YT API */
+.iframe iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}

@@ -6,8 +6,9 @@ export interface Song {
   album: string;
   duration: string;   // MM:SS format
   genre: string;
-  coverUrl?: string;  // Album artwork from iTunes
-  previewUrl?: string; // iTunes 30-second preview
+  coverUrl?: string;   // Album artwork from iTunes
+  previewUrl?: string; // iTunes 30s preview or local file object URL
+  youtubeId?: string;  // YouTube video ID — full song via embed
 }
 
 /** Position in the playlist when adding. */
