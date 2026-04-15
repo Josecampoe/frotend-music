@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './DJDeck.module.css';
 import { VinylRecord } from '../VinylRecord/VinylRecord';
 import { ControlPanel } from '../ControlPanel/ControlPanel';
@@ -13,8 +12,8 @@ export function DJDeck() {
   return (
     <div className={styles.deck}>
       <VinylRecord
-        coverUrl={currentSong?.coverUrl ?? ''}
-        isSpinning={isPlaying && !!currentSong}
+        song={currentSong}
+        isPlaying={isPlaying && !!currentSong}
       />
       <div className={styles.info}>
         <p className={styles.title}>{currentSong?.title ?? 'No track selected'}</p>

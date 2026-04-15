@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './VinylRecord.module.css';
 import { Song } from '../../types';
 

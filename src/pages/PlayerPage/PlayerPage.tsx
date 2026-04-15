@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styles from './PlayerPage.module.css';
 import { DJDeck } from '../../components/DJDeck/DJDeck';
-import { ControlPanel } from '../../components/ControlPanel/ControlPanel';
 import { PlaylistQueue } from '../../components/PlaylistQueue/PlaylistQueue';
 import { AddSongModal } from '../../components/AddSongModal/AddSongModal';
 import { usePlaylist } from '../../hooks/usePlaylist';
@@ -35,12 +34,7 @@ export function PlayerPage() {
     fetchAllSongs();
   }, [fetchAllSongs]);
 
-  // Derive prev/next from songs array relative to currentSong
-  const currentIndex = songs.findIndex((s) => s.id === currentSong?.id);
-  const prevSong: Song | null = currentIndex > 0 ? songs[currentIndex - 1] : null;
-  const nextSong: Song | null = currentIndex < songs.length - 1 ? songs[currentIndex + 1] : null;
-
-  const handleSelectSong = (song: Song) => {
+  const handleSelectSong = (_song: Song) => {
     // Optimistically set current song for immediate UI feedback
     // The actual navigation is handled by the backend
   };
@@ -80,13 +74,7 @@ export function PlayerPage() {
       <main className={styles.layout}>
         {/* Center column: deck + controls */}
         <div className={styles.centerColumn}>
-          <DJDeck
-            prevSong={prevSong}
-            currentSong={currentSong}
-            nextSong={nextSong}
-            isPlaying={isPlaying}
-          />
-          <ControlPanel />
+          <DJDeck />
         </div>
 
         {/* Right sidebar: playlist queue */}
