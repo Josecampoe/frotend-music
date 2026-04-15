@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #12121a;
+  --color-bg-card: #1a1a2e;
+  --color-accent-purple: #7c3aed;
+  --color-accent-cyan: #06b6d4;
+  --color-accent-pink: #ec4899;
+  --color-accent-orange: #f97316;
+  --color-accent-green: #22c55e;
+  --color-text-primary: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --vinyl-groove: #1e1e2e;
+  --glow-purple: 0 0 20px rgba(124, 58, 237, 0.6);
+  --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.6);
+  --glow-pink: 0 0 20px rgba(236, 72, 153, 0.6);
+  --glow-green: 0 0 20px rgba(34, 197, 94, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
