@@ -1,21 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --color-bg-primary: #0a0a0f;
-  --color-bg-secondary: #12121a;
-  --color-bg-card: #1a1a2e;
+  /* ── Light palette ── */
+  --color-bg-primary:    #f0f2f8;
+  --color-bg-secondary:  #e4e8f4;
+  --color-bg-card:       #ffffff;
+  --color-bg-card2:      #f7f8fc;
+
+  /* Accents — vivid & saturated */
   --color-accent-purple: #7c3aed;
-  --color-accent-cyan: #06b6d4;
-  --color-accent-pink: #ec4899;
-  --color-accent-orange: #f97316;
-  --color-accent-green: #22c55e;
-  --color-text-primary: #f8fafc;
-  --color-text-muted: #94a3b8;
-  --vinyl-groove: #1e1e2e;
-  --glow-purple: 0 0 20px rgba(124, 58, 237, 0.6);
-  --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.6);
-  --glow-pink: 0 0 20px rgba(236, 72, 153, 0.6);
-  --glow-green: 0 0 20px rgba(34, 197, 94, 0.6);
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --color-accent-violet: #6d28d9;
+  --color-accent-cyan:   #0891b2;
+  --color-accent-pink:   #db2777;
+  --color-accent-orange: #ea580c;
+  --color-accent-green:  #16a34a;
+  --color-accent-rose:   #e11d48;
+
+  /* Text */
+  --color-text-primary:  #1e1b4b;
+  --color-text-secondary:#374151;
+  --color-text-muted:    #6b7280;
+
+  /* Shadows & glows */
+  --glow-purple: 0 0 20px rgba(124, 58, 237, 0.35);
+  --glow-cyan:   0 0 20px rgba(8, 145, 178, 0.35);
+  --glow-pink:   0 0 20px rgba(219, 39, 119, 0.35);
+  --glow-green:  0 0 20px rgba(22, 163, 74, 0.35);
+
+  /* Glass */
+  --glass-bg:     rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(124, 58, 237, 0.12);
+
+  /* Card shadow */
+  --shadow-card: 0 4px 24px rgba(124, 58, 237, 0.08), 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 8px 40px rgba(124, 58, 237, 0.16), 0 2px 8px rgba(0,0,0,0.08);
 }

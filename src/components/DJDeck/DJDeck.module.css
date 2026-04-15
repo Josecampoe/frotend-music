@@ -2,29 +2,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: var(--glass-bg);
+  gap: 1.25rem;
+  padding: 2rem 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(124, 58, 237, 0.12);
   border-radius: 28px;
   position: relative;
   overflow: hidden;
   flex: 1;
   min-width: 0;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.4s ease;
+}
+
+.deck:hover {
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* Blurred album art background */
 .artGlow {
   position: absolute;
-  inset: -20px;
+  inset: -30px;
   background-size: cover;
   background-position: center;
-  filter: blur(60px) saturate(1.5);
-  opacity: 0.12;
+  filter: blur(80px) saturate(2);
+  opacity: 0.15;
   pointer-events: none;
   z-index: 0;
-  transition: opacity 1s ease;
+  transition: opacity 1.2s ease;
 }
 
 .inner {
@@ -33,7 +39,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   width: 100%;
 }
 
@@ -42,6 +48,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  filter: drop-shadow(0 8px 24px rgba(124, 58, 237, 0.2));
 }
 
 /* Song info */
@@ -50,29 +57,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  max-width: 320px;
+  gap: 0.25rem;
+  max-width: 340px;
   width: 100%;
 }
 
 .songTitle {
   font-family: 'Orbitron', monospace;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
-  text-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 
 .songArtist {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-accent-cyan);
-  letter-spacing: 0.05em;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-accent-purple);
+  letter-spacing: 0.04em;
 }
 
 .songMeta {
@@ -85,34 +91,31 @@
   justify-content: center;
 }
 
-.dot {
-  opacity: 0.4;
-}
+.dot { opacity: 0.4; }
 
 /* BPM badge */
 .bpmBadge {
   display: flex;
   align-items: baseline;
   gap: 0.3rem;
-  background: rgba(124, 58, 237, 0.12);
-  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(219, 39, 119, 0.08));
+  border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: 20px;
-  padding: 0.3rem 0.9rem;
-  margin-top: 0.25rem;
+  padding: 0.3rem 1rem;
+  margin-top: 0.2rem;
 }
 
 .bpmValue {
   font-family: 'Orbitron', monospace;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 900;
   color: var(--color-accent-purple);
-  text-shadow: var(--glow-purple);
   line-height: 1;
 }
 
 .bpmLabel {
   font-family: 'Orbitron', monospace;
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -131,9 +134,9 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.65rem;
-  color: #ff6b6b;
-  background: rgba(255, 0, 0, 0.08);
-  border: 1px solid rgba(255, 0, 0, 0.2);
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.15);
   border-radius: 20px;
   padding: 0.2rem 0.75rem;
   align-self: center;
@@ -144,10 +147,10 @@
 .previewBadge {
   font-size: 0.65rem;
   color: var(--color-accent-cyan);
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  background: rgba(8, 145, 178, 0.08);
+  border: 1px solid rgba(8, 145, 178, 0.2);
   border-radius: 20px;
   padding: 0.2rem 0.75rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   animation: fadeIn 0.4s ease;
 }
