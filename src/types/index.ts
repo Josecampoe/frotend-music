@@ -7,6 +7,7 @@ export interface Song {
   duration: string; // MM:SS format
   genre: string;
   coverUrl?: string;
+  previewUrl?: string; // iTunes 30-second preview
 }
 
 /** Payload for creating a new song. */

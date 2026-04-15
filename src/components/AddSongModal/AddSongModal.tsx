@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './AddSongModal.module.css';
 import { CreateSongDTO, Position } from '../../types';
+import { searchItunes, msToMMSS, ItunesTrack } from '../../services/itunes.service';
 
 interface AddSongModalProps {
   onClose: () => void;
@@ -19,13 +20,78 @@ interface FormState {
 
 const EMPTY: FormState = { title: '', artist: '', album: '', duration: '', genre: '' };
 
-/** Modal for adding a new song with position selector. */
+/** Modal for adding a new song — with iTunes search autocomplete. */
 export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [positionType, setPositionType] = useState<'first' | 'last' | 'specific'>('last');
   const [specificPos, setSpecificPos] = useState(1);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // iTunes search state
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<ItunesTrack[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState<ItunesTrack | null>(null);
+  const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
+  const [playingPreview, setPlayingPreview] = useState<number | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounced iTunes search
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!query.trim()) { setResults([]); return; }
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const tracks = await searchItunes(query);
+        setResults(tracks);
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 400);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => { previewAudio?.pause(); };
+  }, [previewAudio]);
+
+  const handleSelectTrack = (track: ItunesTrack) => {
+    setSelectedTrack(track);
+    setForm({
+      title: track.trackName,
+      artist: track.artistName,
+      album: track.collectionName ?? '',
+      duration: msToMMSS(track.trackTimeMillis),
+      genre: GENRES.find((g) =>
+        track.primaryGenreName.toLowerCase().includes(g.toLowerCase())
+      ) ?? '',
+    });
+    setResults([]);
+    setQuery('');
+    // Stop any playing preview
+    previewAudio?.pause();
+    setPlayingPreview(null);
+  };
+
+  const togglePreview = (track: ItunesTrack) => {
+    if (playingPreview === track.trackId) {
+      previewAudio?.pause();
+      setPlayingPreview(null);
+      return;
+    }
+    previewAudio?.pause();
+    const audio = new Audio(track.previewUrl);
+    audio.volume = 0.6;
+    audio.play();
+    audio.onended = () => setPlayingPreview(null);
+    setPreviewAudio(audio);
+    setPlayingPreview(track.trackId);
+  };
 
   const validate = (): boolean => {
     const errs: Partial<FormState> = {};
@@ -50,8 +116,8 @@ export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    const position: Position =
-      positionType === 'specific' ? specificPos : positionType;
+    previewAudio?.pause();
+    const position: Position = positionType === 'specific' ? specificPos : positionType;
     try {
       await onAdd({
         title: form.title.trim(),
@@ -60,7 +126,9 @@ export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
         duration: form.duration.trim(),
         genre: form.genre,
         position,
-      });
+        coverUrl: selectedTrack?.artworkUrl100.replace('100x100', '300x300'),
+        previewUrl: selectedTrack?.previewUrl,
+      } as CreateSongDTO & { coverUrl?: string; previewUrl?: string });
       onClose();
     } finally {
       setSubmitting(false);
@@ -76,6 +144,93 @@ export function AddSongModal({ onClose, onAdd }: AddSongModalProps) {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
+
+          {/* iTunes Search */}
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="itunes-search">
+              🎵 Buscar en iTunes
+            </label>
+            <div className={styles.searchWrapper}>
+              <input
+                id="itunes-search"
+                className={styles.input}
+                placeholder="Busca una canción o artista..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoComplete="off"
+              />
+              {searching && <span className={styles.searchSpinner}>⟳</span>}
+            </div>
+
+            {/* Search results dropdown */}
+            {results.length > 0 && (
+              <ul className={styles.resultsList} role="listbox">
+                {results.map((track) => (
+                  <li key={track.trackId} className={styles.resultItem} role="option" aria-selected={false}>
+                    <img
+                      src={track.artworkUrl100}
+                      alt={track.collectionName}
+                      className={styles.resultArt}
+                    />
+                    <div className={styles.resultInfo} onClick={() => handleSelectTrack(track)}>
+                      <span className={styles.resultTitle}>{track.trackName}</span>
+                      <span className={styles.resultArtist}>{track.artistName}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className={`${styles.previewBtn} ${playingPreview === track.trackId ? styles.previewPlaying : ''}`}
+                      onClick={() => togglePreview(track)}
+                      aria-label={playingPreview === track.trackId ? 'Detener preview' : 'Escuchar preview'}
+                      title="Preview 30s"
+                    >
+                      {playingPreview === track.trackId ? '⏹' : '▶'}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.selectBtn}
+                      onClick={() => handleSelectTrack(track)}
+                      aria-label="Seleccionar canción"
+                    >
+                      ✓
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Selected track preview */}
+          {selectedTrack && (
+            <div className={styles.selectedTrack}>
+              <img
+                src={selectedTrack.artworkUrl100.replace('100x100', '300x300')}
+                alt={selectedTrack.collectionName}
+                className={styles.selectedArt}
+              />
+              <div className={styles.selectedInfo}>
+                <span className={styles.selectedTitle}>{selectedTrack.trackName}</span>
+                <span className={styles.selectedArtist}>{selectedTrack.artistName}</span>
+                <button
+                  type="button"
+                  className={`${styles.previewBtn} ${playingPreview === selectedTrack.trackId ? styles.previewPlaying : ''}`}
+                  onClick={() => togglePreview(selectedTrack)}
+                >
+                  {playingPreview === selectedTrack.trackId ? '⏹ Detener' : '▶ Preview 30s'}
+                </button>
+              </div>
+              <button
+                type="button"
+                className={styles.clearSelected}
+                onClick={() => { setSelectedTrack(null); setForm(EMPTY); previewAudio?.pause(); setPlayingPreview(null); }}
+                aria-label="Quitar selección"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          <div className={styles.divider} />
+
           {/* Title */}
           <div className={styles.field}>
             <label className={styles.label} htmlFor="title">
