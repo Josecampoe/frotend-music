@@ -4,8 +4,10 @@ import { DJDeck } from '../../components/DJDeck/DJDeck';
 import { PlaylistQueue } from '../../components/PlaylistQueue/PlaylistQueue';
 import { AddSongModal } from '../../components/AddSongModal/AddSongModal';
 import { LocalFilesModal } from '../../components/LocalFilesModal/LocalFilesModal';
+import { DJModePanel } from '../../components/DJModePanel/DJModePanel';
 import { usePlaylist } from '../../hooks/usePlaylist';
 import { usePlayer } from '../../hooks/usePlayer';
+import { usePlayerContext } from '../../context/PlayerContext';
 import { Song } from '../../types';
 
 function useStars(count: number) {
@@ -26,6 +28,7 @@ function useStars(count: number) {
 export function PlayerPage() {
   const { songs, currentSong, loading, fetchAllSongs, addSong, addManySongs, removeSong, selectSong } = usePlaylist();
   const { isPlaying } = usePlayer();
+  const { isDJMode } = usePlayerContext();
   const [showModal, setShowModal] = useState(false);
   const [showLocalModal, setShowLocalModal] = useState(false);
   const stars = useStars(100);
@@ -69,6 +72,7 @@ export function PlayerPage() {
           <span className={styles.appName}>DJ PLAYLIST</span>
         </div>
         <div className={styles.topRight}>
+          {isDJMode && <span className={styles.djModeBadge}>🎛️ DJ MODE</span>}
           <div className={`${styles.statusDot} ${isPlaying ? styles.statusPlaying : ''}`} />
           <span className={styles.statusText}>
             {isPlaying ? 'REPRODUCIENDO' : songs.length > 0 ? 'EN PAUSA' : 'SIN CANCIONES'}
@@ -83,6 +87,7 @@ export function PlayerPage() {
       <main className={styles.layout}>
         <div className={styles.centerColumn}>
           <DJDeck />
+          <DJModePanel />
         </div>
 
         <aside className={styles.sidebar}>

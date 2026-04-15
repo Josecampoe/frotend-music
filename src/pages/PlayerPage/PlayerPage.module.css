@@ -123,6 +123,19 @@
   font-family: 'Orbitron', monospace;
 }
 
+.djModeBadge {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--color-accent-pink);
+  background: rgba(236, 72, 153, 0.12);
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+  letter-spacing: 0.1em;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
 /* Main layout */
 .layout {
   position: relative;

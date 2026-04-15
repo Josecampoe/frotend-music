@@ -33,6 +33,10 @@ interface PlayerContextValue {
   isRepeat: boolean;
   setIsRepeat: (v: boolean) => void;
 
+  // DJ Mode
+  isDJMode: boolean;
+  setIsDJMode: (v: boolean) => void;
+
   // Toast notifications
   toasts: Toast[];
   addToast: (message: string, type?: Toast['type']) => void;
@@ -52,6 +56,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [volume, setVolume] = useState(75);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
+  const [isDJMode, setIsDJMode] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [bpm] = useState(() => Math.floor(Math.random() * 60) + 80); // 80–140
   const toastCounter = useRef(0);
@@ -83,6 +88,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         setIsShuffle,
         isRepeat,
         setIsRepeat,
+        isDJMode,
+        setIsDJMode,
         toasts,
         addToast,
         removeToast,
